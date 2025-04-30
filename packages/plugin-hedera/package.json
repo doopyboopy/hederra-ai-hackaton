@@ -47,6 +47,14 @@
             "HEDERA_KEY_TYPE": {
                 "type": "string",
                 "description": "Accepts 'ECDSA' or 'ED25519'"
+            },
+            "HEDERA_PUBLIC_KEY": {
+                "type": "string",
+                "description": "Account public key."
+            },
+            "HEDERA_TOPIC_ID": {
+                "type": "string",
+                "description": "Topic to listen for new messages. Example: 0.0.5392887"
             }
         }
     }
