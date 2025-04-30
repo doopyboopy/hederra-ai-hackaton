@@ -76,7 +76,9 @@ class HCS10Client {
             async () => {
                 try {
                     const newDate = Math.floor(Date.now() / 1000);
-                    elizaLogger.debug("Getting hedera topic messages");
+                    elizaLogger.debug(
+                        `Getting hedera topic messages from ${this.lastMessageTimestamp} to ${newDate}`,
+                    );
                     const messages = await hederaProvider.getTopicMessages(
                         TopicId.fromString(hederaTopicId),
                         hederaNetworkType,
@@ -91,8 +93,6 @@ class HCS10Client {
                             `New ${messages?.length} ${hederaTopicId} topic messages`,
                         );
                     }
-
-                    this.lastMessageTimestamp = Date.now() / 1000;
 
                     for (const message of messages) {
                         if (message.payer_account_id === hederaAgentAccountId) {
@@ -166,6 +166,7 @@ class HCS10Client {
                         const responseMessage: Memory = {
                             id: stringToUuid(`${messageId}-${runtime.agentId}`),
                             ...userMessage,
+                            content: response,
                             embedding: getEmbeddingZeroVector(),
                             createdAt: Date.now(),
                         };
@@ -176,14 +177,18 @@ class HCS10Client {
 
                         state = await runtime.updateRecentMessageState(state);
 
-                        let resultMessage = null as Content | null;
-
                         await runtime.processActions(
                             memory,
                             [responseMessage],
                             state,
-                            async (newMessages) => {
-                                resultMessage = newMessages;
+                            async (newMessage) => {
+                                elizaLogger.debug(
+                                    `New message from action: ${JSON.stringify(newMessage)}`,
+                                );
+                                await hederaProvider.submitTopicMessage(
+                                    TopicId.fromString(hederaTopicId),
+                                    newMessage.text,
+                                );
                                 return [memory];
                             },
                         );
@@ -198,9 +203,6 @@ class HCS10Client {
 
                         elizaLogger.debug(
                             `response: ${JSON.stringify(response)}`,
-                        );
-                        elizaLogger.debug(
-                            `resultMessage: ${JSON.stringify(resultMessage)}`,
                         );
 
                         if (!shouldSuppressInitialMessage) {
