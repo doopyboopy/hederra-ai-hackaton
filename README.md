@@ -17,6 +17,11 @@ Hedera [HIP-991](https://hips.hedera.com/hip/hip-991) Permissionless revenue-gen
 
 Hedera [HCS-10](https://hips.hedera.com/hip/hcs-10) Topic Operators: To interact with the agent, you need to be a topic operator.
 
+## Key files
+
+- [audit-contract.ts](./packages/plugin-hedera/src/actions/audit-contract/audit-contract.ts) - The main action that performs the audit
+- [hedera-topics.ts](./packages/plugin-hedera/src/client/hedera-topics.ts) - The client that handles the Hedera topics communication
+
 ## Features
 
 - **Smart Contract Analysis**: Deep analysis of Solidity smart contracts for security vulnerabilities and best practices
