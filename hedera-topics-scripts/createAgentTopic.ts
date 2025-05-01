@@ -3,7 +3,8 @@ import {
   PrivateKey,
   AccountId,
   CustomFixedFee,
-  TopicCreateTransaction
+  TopicCreateTransaction,
+  PublicKey
 } from '@hashgraph/sdk';
 
 import dotenv from 'dotenv';
@@ -13,10 +14,11 @@ dotenv.config();
 async function main() {
   if (
     !process.env.AGENT_HEDERA_ACCOUNT_ID ||
-    !process.env.AGENT_HEDERA_PRIVATE_KEY
+    !process.env.AGENT_HEDERA_PRIVATE_KEY ||
+    !process.env.AGENT_HEDERA_PUBLIC_KEY
   ) {
     throw new Error(
-      'AGENT_HEDERA_ACCOUNT_ID | AGENT_HEDERA_PRIVATE_KEY is not set in the environment variables'
+      'AGENT_HEDERA_ACCOUNT_ID | AGENT_HEDERA_PRIVATE_KEY | AGENT_HEDERA_PUBLIC_KEY is not set in the environment variables'
     );
   }
 
@@ -28,23 +30,41 @@ async function main() {
     PrivateKey.fromStringECDSA(process.env.AGENT_HEDERA_PRIVATE_KEY)
   );
 
+  // Create topic to interact with the agent
   const customFee = new CustomFixedFee({
     feeCollectorAccountId: AccountId.fromString(process.env.AGENT_HEDERA_ACCOUNT_ID),
     amount: 10
   });
 
-  const topicCreateTx = new TopicCreateTransaction().setCustomFees([customFee]);
+  const agentTopicCreateTx = new TopicCreateTransaction()
+    .setCustomFees([customFee])
+    .setFeeExemptKeys(
+      [
+        PublicKey.fromStringECDSA(process.env.AGENT_HEDERA_PUBLIC_KEY)
+      ]
+    );
 
-  const executeTopicCreateTx = await topicCreateTx.execute(newClient)
-  const topicCreateReceipt = await executeTopicCreateTx.getReceipt(newClient)
-  const topicId = topicCreateReceipt.topicId
+  const executeAgentTopicCreateTx = await agentTopicCreateTx.execute(newClient)
+  const agentTopicCreateReceipt = await executeAgentTopicCreateTx.getReceipt(newClient)
+  const agentTopicId = agentTopicCreateReceipt.topicId
 
-  console.log(`Topic created successfully with ID: ${topicId}`)
+  console.log(`Agent topic created successfully with ID: ${agentTopicId}`)
+
+  // Create topic to publish audit scores
+  const auditsTopicCreateTx = new TopicCreateTransaction().setSubmitKey(
+    PublicKey.fromStringECDSA(process.env.AGENT_HEDERA_PUBLIC_KEY)
+  );
+
+  const executeAuditsTopicCreateTx = await auditsTopicCreateTx.execute(newClient)
+  const auditsTopicCreateReceipt = await executeAuditsTopicCreateTx.getReceipt(newClient)
+  const auditsTopicId = auditsTopicCreateReceipt.topicId
+
+  console.log(`Audits topic created succesfully with ID: ${auditsTopicId}`)
 }
 
 main()
   .then(() => {
-    console.log('Message submitted successfully');
+    console.log('Topics created successfully');
     process.exit(0);
   })
   .catch((error) => {

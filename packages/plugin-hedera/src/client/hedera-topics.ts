@@ -13,7 +13,7 @@ import {
 } from "@elizaos/core";
 import { HederaProvider } from "../providers/client";
 import type { HederaNetworkType } from "hedera-agent-kit/src/types";
-import { TopicId, Timestamp } from "@hashgraph/sdk";
+import { TopicId } from "@hashgraph/sdk";
 
 export const messageHandlerTemplate =
     // {{goals}}
@@ -40,15 +40,15 @@ About {{agentName}}:
 # Instructions: Write the next message for {{agentName}}.
 ${messageCompletionFooter}`;
 
-class HCS10Client {
+class HederaTopicsClient {
     interval: NodeJS.Timeout;
     runtime: IAgentRuntime;
     lastMessageTimestamp: number;
 
     constructor(runtime: IAgentRuntime) {
-        const hederaTopicId = runtime.getSetting("HEDERA_TOPIC_ID");
-        if (!hederaTopicId) {
-            elizaLogger.error("HEDERA_TOPIC_ID is not set");
+        const hederaAgentTopicId = runtime.getSetting("HEDERA_AGENT_TOPIC_ID");
+        if (!hederaAgentTopicId) {
+            elizaLogger.error("HEDERA_AGENT_TOPIC_ID is not set");
             return;
         }
         const hederaNetworkType = runtime.getSetting(
@@ -68,7 +68,7 @@ class HCS10Client {
 
         this.lastMessageTimestamp = Date.now() / 1000;
         elizaLogger.info(
-            `HCS10 starting date ${this.lastMessageTimestamp} for topic ${hederaTopicId} on network ${hederaNetworkType}`,
+            `Hedera topics client starting date ${this.lastMessageTimestamp} for topic ${hederaAgentTopicId} on network ${hederaNetworkType}`,
         );
 
         this.runtime = runtime;
@@ -80,7 +80,7 @@ class HCS10Client {
                         `Getting hedera topic messages from ${this.lastMessageTimestamp} to ${newDate}`,
                     );
                     const messages = await hederaProvider.getTopicMessages(
-                        TopicId.fromString(hederaTopicId),
+                        TopicId.fromString(hederaAgentTopicId),
                         hederaNetworkType,
                         this.lastMessageTimestamp,
                         newDate,
@@ -90,7 +90,7 @@ class HCS10Client {
 
                     if (messages) {
                         elizaLogger.debug(
-                            `New ${messages?.length} ${hederaTopicId} topic messages`,
+                            `New ${messages?.length} ${hederaAgentTopicId} topic messages`,
                         );
                     }
 
@@ -114,7 +114,7 @@ class HCS10Client {
 
                         const content: Content = {
                             text: textMessage,
-                            source: "hcs10",
+                            source: "hedera-topic-client",
                             inReplyTo: undefined,
                         };
 
@@ -122,14 +122,14 @@ class HCS10Client {
                             content,
                             userId: stringToUuid(userAccountId),
                             roomId: stringToUuid(
-                                `${hederaTopicId}-${userAccountId}`,
+                                `${hederaAgentTopicId}-${userAccountId}`,
                             ),
                             agentId: runtime.agentId,
                         };
 
                         const memory: Memory = {
                             id: stringToUuid(
-                                `${hederaTopicId}-${message.sequence_number}`,
+                                `${hederaAgentTopicId}-${message.sequence_number}`,
                             ),
                             ...userMessage,
                             createdAt: Date.now(),
@@ -186,7 +186,7 @@ class HCS10Client {
                                     `New message from action: ${JSON.stringify(newMessage)}`,
                                 );
                                 await hederaProvider.submitTopicMessage(
-                                    TopicId.fromString(hederaTopicId),
+                                    TopicId.fromString(hederaAgentTopicId),
                                     newMessage.text,
                                 );
                                 return [memory];
@@ -206,16 +206,16 @@ class HCS10Client {
                         );
 
                         if (!shouldSuppressInitialMessage) {
-                            // send response to hcs10 topic
+                            // send response to hedera topic
                             await hederaProvider.submitTopicMessage(
-                                TopicId.fromString(hederaTopicId),
+                                TopicId.fromString(hederaAgentTopicId),
                                 response.text,
                             );
                         }
                     }
                 } catch (error) {
                     elizaLogger.error(
-                        `Error in HCS10 client: ${error}`,
+                        `Error in hedera topics client: ${error}`,
                         error as Error,
                     );
                     return;
@@ -226,17 +226,17 @@ class HCS10Client {
     }
 
     async stop() {
-        elizaLogger.info("Stopping HCS10 client...");
+        elizaLogger.info("Stopping hedera topics client...");
         clearInterval(this.interval);
     }
 }
 
-export const HCS10ClientInterface: Client = {
-    name: "hcs10",
+export const HederaTopicsClientInterface: Client = {
+    name: "hedera-topics-client",
     start: async (runtime: IAgentRuntime) => {
-        elizaLogger.info("Starting HCS10 client...");
+        elizaLogger.info("Starting hedera topics client...");
 
-        const client = new HCS10Client(runtime);
+        const client = new HederaTopicsClient(runtime);
 
         return client;
     },
