@@ -11,6 +11,12 @@ This project extends ElizaOS with Hedera integration to create an autonomous age
 - Publishes detailed audit reports and scores to a public Hedera topic
 - Maintains a transparent and immutable record of all audits
 
+## Key concepts
+
+Hedera [HIP-991](https://hips.hedera.com/hip/hip-991) Permissionless revenue-generating Topic Ids for Topic Operators: To Interact with the agent, you need to send a message to the configured topic that requires a fee. This fee will be used to pay for the agent's services.
+
+Hedera [HCS-10](https://hips.hedera.com/hip/hcs-10) Topic Operators: To interact with the agent, you need to be a topic operator.
+
 ## Features
 
 - **Smart Contract Analysis**: Deep analysis of Solidity smart contracts for security vulnerabilities and best practices
@@ -98,6 +104,7 @@ It will use the [default hedera character](./characters/hedera.character.json).
 ### Request Topic
 
 - Used to submit contracts for audit
+- Requires a fee to send the message, which will be the payment for the agent. In compliance with [HIP-991](https://hips.hedera.com/hip/hip-991)
 
 ### Public Topic
 
@@ -108,3 +115,69 @@ It will use the [default hedera character](./characters/hedera.character.json).
 - [ElizaOS](https://github.com/elizaos/elizaos) - Base agent framework
 - [Hedera](https://hedera.com) - Distributed ledger technology
 - [Hashgraph SDK](https://github.com/hashgraph/hedera-sdk-js) - Hedera JavaScript SDK
+
+## Hackathon Presentation
+
+### Problem Statement
+
+Smart contract security is critical in Web3, but current audit processes are:
+
+- Expensive
+- Time-consuming
+- Not transparent
+- Difficult to verify
+
+### Our Solution
+
+An autonomous agent that:
+
+- Automates smart contract auditing
+- Uses Hedera's Consensus Service for transparent communication
+- Implements HIP-991 for sustainable revenue generation
+- Provides immutable audit records on-chain
+
+### Key Innovations
+
+1. **Autonomous Auditing**
+
+    - Self-operating agent that performs comprehensive audits
+    - No human intervention required
+    - Consistent and objective analysis
+
+2. **Transparent Process**
+
+    - All audit requests and results stored on Hedera
+    - Public verification of audit results
+    - Immutable audit history
+
+3. **Sustainable Business Model**
+
+    - Implements HIP-991 for revenue generation
+    - Fair pricing through topic message fees
+    - Self-sustaining operation
+
+### Impact
+
+- Democratizes smart contract auditing
+- Reduces audit costs
+- Increases transparency in Web3
+- Creates new revenue opportunities for developers
+
+### Future Vision
+
+- Expand to multiple smart contract languages
+- Implement machine learning for better vulnerability detection
+- Create a reputation system for auditors
+- Develop a web interface for easy interaction
+
+### Demo
+
+[Insert demo video or live demonstration details here]
+
+### Team
+
+[Insert team member names and roles here]
+
+### Contact
+
+[Insert contact information for follow-up questions]
