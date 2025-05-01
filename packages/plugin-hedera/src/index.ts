@@ -22,13 +22,14 @@ import { mintTokenAction } from "./actions/mint-token/mint-token.ts";
 import { setSpendingApprovalAction } from "./actions/set-spending-approval/set-spending-approval.ts";
 import { createNFTTokenAction } from "./actions/create-nft-token/create-nft-token.ts";
 import { mintNFTTokenAction } from "./actions/mint-nft-token/mint-token.ts";
-import { HCS10ClientInterface } from "./client/hcs10.ts";
+import { auditContractAction } from "./actions/audit-contract/audit-contract.ts";
+import { HederaTopicsClientInterface } from "./client/hedera-topics.ts";
 
 export const hederaPlugin: Plugin = {
     name: "Hedera",
     description: "Hedera blockchain integration plugin",
     providers: [hederaClientProvider],
-    clients: [HCS10ClientInterface],
+    clients: [HederaTopicsClientInterface],
     evaluators: [],
     services: [],
     actions: [
@@ -54,7 +55,8 @@ export const hederaPlugin: Plugin = {
         createNFTTokenAction,
         mintNFTTokenAction,
         setSpendingApprovalAction,
-        createNFTTokenAction
+        createNFTTokenAction,
+        auditContractAction
     ],
 };
 

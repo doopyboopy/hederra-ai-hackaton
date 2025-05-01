@@ -25,8 +25,6 @@ import { bootstrapPlugin } from "@elizaos/plugin-bootstrap";
 import { hederaPlugin } from "@elizaos/plugin-hedera";
 import JSON5 from "json5";
 
-import { auditContractAction } from "./customAction.ts"
-
 import fs from "fs";
 import net from "net";
 import os from "os";
@@ -672,7 +670,7 @@ export async function createAgent(
         character,
         // character.plugins are handled when clients are added
         plugins: [bootstrapPlugin, hederaPlugin].flat().filter(Boolean),
-        actions: [auditContractAction],
+        actions: [],
         providers: [],
         managers: [],
         fetch: logFetch,

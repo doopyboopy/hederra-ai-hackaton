@@ -8,6 +8,8 @@ import {
   type Action,
   elizaLogger
 } from "@elizaos/core";
+import { TopicId } from "@hashgraph/sdk";
+import { HederaProvider } from "../../providers/client";
 
 const getAuditSummaryPrompt = (contract: string) => {
   return `
@@ -67,12 +69,12 @@ export const auditContractAction: Action = {
     "INSPECT_CONTRACT"
   ],
   description: "Audits an smart contract",
-  validate: async (runtime: IAgentRuntime, memory: Memory, state: State) => {
+  validate: async (_runtime: IAgentRuntime, memory: Memory, _state: State) => {
 
     return memory.content.text.includes(".sol") || memory.content.text.includes("gist.githubusercontent.com")
   },
 
-  handler: async (runtime: IAgentRuntime, memory: Memory, state?: State, options?, callback?: HandlerCallback) => {
+  handler: async (runtime: IAgentRuntime, memory: Memory, _state?: State, _options?, callback?: HandlerCallback) => {
     if (callback) {
       const gistURL = await generateText({
         runtime,
@@ -98,9 +100,14 @@ export const auditContractAction: Action = {
 
       const { summary, observations, score } = JSON.parse(audit);
 
-      if (score) {
-        `Contract at ${gistURL} audited with score ${score}`
-        // TODO: Send message to topic
+      const hederaTopicId = runtime.getSetting("HEDERA_AUDITS_TOPIC_ID");
+      if (score && hederaTopicId) {
+        const hederaProvider = new HederaProvider(runtime).getHederaAgentKit();
+
+        await hederaProvider.submitTopicMessage(
+          TopicId.fromString(hederaTopicId),
+          `Contract at ${gistURL} audited with score ${score}`,
+        );
       }
 
       callback({
@@ -174,6 +181,7 @@ export const auditContractAction: Action = {
   ]]
 }
 
+// TODO: Implement audits from verified contracts on hashscan
 export const auditHederaDeployedContractAcion: Action = {
   name: "AUDIT_HEDERA_CONTRACT",
   description: "Audits an smart contract deployed in the Hedera blockchain.",
@@ -181,11 +189,11 @@ export const auditHederaDeployedContractAcion: Action = {
     "REVIEW_HEDERA_CONTRACT",
     "INSPECT_HEDERA_CONTRACT"
   ],
-  validate: async (runtime: IAgentRuntime) => { return true },
+  validate: async (_runtime: IAgentRuntime) => { return true },
   handler: async (
     _runtime: IAgentRuntime,
     _message: Memory,
-    state: State,
+    _state: State,
     _options: { [key: string]: unknown },
     _callback?: HandlerCallback
   ) => { },
