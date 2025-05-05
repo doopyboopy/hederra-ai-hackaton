@@ -93,7 +93,7 @@
     "ws": "8.18.0",
     "zod": "3.24.2"
   },
-  "packageManager": "pnpm@9.15.7",
+  "packageManager": "pnpm@10.10.0",
   "workspaces": [
     "packages/*"
   ]
