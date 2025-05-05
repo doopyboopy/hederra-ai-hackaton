@@ -1,3 +1,5 @@
+import { messageCompletionFooter } from "@elizaos/core";
+
 export const hederaHBARTransferTemplate = `Given the last message:
 {{lastMessage}}
 Extract the following information about the requested HBAR transfer:
@@ -1035,3 +1037,28 @@ Example response for the input: "Mint new NFT token. Set it's metadata to 'https
 
 Now respond with a JSON markdown block containing only the extracted values.
 `;
+
+export const hederaMessageHandlerTemplate =
+    `
+# Task: Generate dialog and actions for the character {{agentName}} interacting via Hedera Consensus Service.
+
+# About {{agentName}}:
+{{bio}}
+{{lore}}
+Your Hedera Account ID: {{agentId}}
+You are communicating with user {{userName}} ({{userId}}) on topic {{connectionTopicId}}.
+
+# Examples of {{agentName}}'s dialog and actions:
+{{characterMessageExamples}}
+
+# Capabilities
+Note that {{agentName}} can process text messages. It can also interact with Hedera-specific actions.
+
+# Actions Available
+{{actions}}
+
+# Recent Message History (newest first):
+{{recentMessages}}
+
+# Instructions: Write the next message for {{agentName}} based on the recent history and the latest message ("{{lastMessage}}"). Include an action, if appropriate. {{actionNames}}
+${messageCompletionFooter}`;

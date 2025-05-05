@@ -24,12 +24,13 @@ import { createNFTTokenAction } from "./actions/create-nft-token/create-nft-toke
 import { mintNFTTokenAction } from "./actions/mint-nft-token/mint-token.ts";
 import { auditContractAction } from "./actions/audit-contract/audit-contract.ts";
 import { HederaTopicsClientInterface } from "./client/hedera-topics.ts";
+import { OpenConvaiClientInterface } from "./client/openconvai.ts";
 
 export const hederaPlugin: Plugin = {
     name: "Hedera",
     description: "Hedera blockchain integration plugin",
     providers: [hederaClientProvider],
-    clients: [HederaTopicsClientInterface],
+    clients: [OpenConvaiClientInterface],
     evaluators: [],
     services: [],
     actions: [
