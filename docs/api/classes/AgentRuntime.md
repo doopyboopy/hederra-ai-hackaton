@@ -16,6 +16,9 @@ Creates an instance of AgentRuntime.
 
 #### Parameters
 
+Cool Stuff
+
+
 • **opts**
 
 The options for configuring the AgentRuntime.
